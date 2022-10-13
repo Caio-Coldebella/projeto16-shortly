@@ -16,3 +16,28 @@ export async function postshortenurlController(req,res){
         res.sendStatus(500);
     }
 }
+
+export async function getshorturlbyidController(req,res){
+    const id = parseInt(req.params.id);
+    if(isNaN(id)){
+        res.sendStatus(404);
+        return;
+    }
+    try {
+        const urlrequested = await connection.query('SELECT (url,"shortUrl") FROM urls WHERE id=$1',[id]);
+        if(urlrequested.rows.length === 0){
+            res.sendStatus(404);
+            return;
+        }
+        const objreturn = {
+            id: id,
+            shortUrl: urlrequested.rows[0].shortUrl,
+            url: urlrequested.rows[0].url
+        };
+        await connection.query('UPDATE urls SET "visitCount"="visitCount"+1 WHERE id=$1',[id]);
+        res.send(objreturn).status(200);
+    } catch (error) {
+        console.error(error);
+        res.sendStatus(500);
+    }
+}
