@@ -16,5 +16,14 @@ export async function signupController(req,res){
 }
 
 export async function signinController(req,res){
-    res.status(200).send({token: uuid()});
+    const data = res.locals.data;
+    const tk = uuid();
+    try {
+        const id  = await connection.query('SELECT id FROM users WHERE email=$1',[data.email]);
+        const numid = id.rows[0].id;
+        await connection.query('INSERT INTO authorizations ("userId",token) VALUES ($1,$2)',[numid,tk]);
+        res.status(200).send({token: tk});        
+    } catch (error) {
+        
+    }
 }

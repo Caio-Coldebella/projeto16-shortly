@@ -47,6 +47,7 @@ export async function signinMiddleware(req,res,next){
             res.sendStatus(401);
             return;
         }
+        res.locals.data = data;
         next();
     } catch (error) {
         console.error(error);
