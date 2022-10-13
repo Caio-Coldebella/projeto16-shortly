@@ -1,5 +1,6 @@
 import connection from "../database/database.js";
 import bcrypt from "bcrypt";
+import { v4 as uuid } from 'uuid';
 
 export async function signupController(req,res){
     const data = res.locals.data;
@@ -15,5 +16,5 @@ export async function signupController(req,res){
 }
 
 export async function signinController(req,res){
-    return null;
+    res.status(200).send({token: uuid()});
 }
