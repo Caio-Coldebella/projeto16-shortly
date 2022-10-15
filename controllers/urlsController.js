@@ -34,8 +34,24 @@ export async function getshorturlbyidController(req,res){
             shortUrl: urlrequested.rows[0].shortUrl,
             url: urlrequested.rows[0].url
         };
-        await connection.query('UPDATE urls SET "visitCount"="visitCount"+1 WHERE id=$1',[id]);
         res.send(objreturn).status(200);
+    } catch (error) {
+        console.error(error);
+        res.sendStatus(500);
+    }
+}
+
+export async function returnshorturlController(req,res){
+    const url = String(req.params.shortUrl);
+    try {
+        const shorturl = await connection.query('SELECT * FROM urls WHERE "shortUrl"=$1',[url]);
+        if(shorturl.rows.length === 0){
+            res.sendStatus(404);
+            return;
+        }
+        const urlredirect = shorturl.rows[0].url;
+        await connection.query('UPDATE urls SET "visitCount"="visitCount"+1 WHERE id=$1',[shorturl.rows[0].id]);
+        res.status(302).redirect(urlredirect);
     } catch (error) {
         console.error(error);
         res.sendStatus(500);
