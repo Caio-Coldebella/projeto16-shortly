@@ -24,7 +24,7 @@ export async function getshorturlbyidController(req,res){
         return;
     }
     try {
-        const urlrequested = await connection.query('SELECT (url,"shortUrl") FROM urls WHERE id=$1',[id]);
+        const urlrequested = await connection.query('SELECT * FROM urls WHERE id=$1',[id]);
         if(urlrequested.rows.length === 0){
             res.sendStatus(404);
             return;
