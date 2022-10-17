@@ -57,3 +57,15 @@ export async function returnshorturlController(req,res){
         res.sendStatus(500);
     }
 }
+
+export async function deleteurlController(req,res){
+    const id = res.locals.id;
+    try {
+        await connection.query('DELETE FROM "userUrls" WHERE "urlId"=$1',[id]);
+        await connection.query('DELETE FROM "urls" WHERE id=$1',[id]);
+        res.sendStatus(204);
+    } catch (error) {
+        console.error(error);
+        res.sendStatus(500);
+    }
+}

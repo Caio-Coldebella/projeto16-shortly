@@ -27,3 +27,35 @@ export async function postshortenurlMiddleware(req,res,next){
         res.sendStatus(500);
     }
 }
+
+export async function deleteurlMiddleware(req,res,next){
+    const auth = req.headers.authorization?req.headers.authorization.replace('Bearer ',''):null;
+    const idurl = req.params.id;
+    if(auth === null){
+        res.sendStatus(401);
+        return;
+    }
+    try {
+        const token = await connection.query('SELECT * FROM authorizations WHERE token=$1',[auth]);
+        if(token.rows.length === 0){
+            res.sendStatus(401);
+            return;
+        }
+        const iduser = token.rows[0].userId;
+        const urlexists = await connection.query('SELECT * FROM "userUrls" WHERE "urlId"=$1',[idurl]);
+        if(urlexists.rows.length === 0){
+            res.sendStatus(404);
+            return;
+        }
+        const url = await connection.query('SELECT * FROM "userUrls" WHERE "userId"=$1 AND "urlId"=$2',[iduser,idurl]);
+        if(url.rows.length === 0){
+            res.sendStatus(401);
+            return;
+        }
+        res.locals.id = idurl;
+        next();
+    } catch (error) {
+        console.error(error);
+        res.sendStatus(500);
+    }
+}
